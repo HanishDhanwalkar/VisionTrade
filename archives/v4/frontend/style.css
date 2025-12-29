@@ -1,0 +1,64 @@
+body {
+    margin: 0;
+    background: #111;
+    color: #ddd;
+    font-family: Arial, sans-serif;
+}
+
+#controls {
+    padding: 10px;
+    background: #1a1a1a;
+    border-bottom: 1px solid #333;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#chart-wrapper {
+    resize: vertical;
+    overflow: hidden;
+    height: 500px;
+    min-height: 200px;
+    max-height: 90vh;
+    border-bottom: 2px solid #333;
+}
+
+#chart {
+    width: 100%;
+    height: 100%;
+}
+
+button {
+    background: #333;
+    color: #ddd;
+    border: 1px solid #555;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+button:hover {
+    background: #444;
+}
+
+button:active {
+    background: #555;
+}
+
+#status {
+    color: #888;
+    font-size: 12px;
+    margin-left: auto;
+}
+
+.connected {
+    color: #26a69a !important;
+}
+
+.disconnected {
+    color: #ef5350 !important;
+}
+
+.loading {
+    color: #ffa726 !important;
+}

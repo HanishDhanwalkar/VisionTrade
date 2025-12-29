@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>BTCUSDT Chart</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+
+<body>
+
+    <!-- Controls -->
+    <div id="controls">
+        <button onclick="trade('buy')">Buy</button>
+        <button onclick="trade('sell')">Sell</button>
+        <span id="status">Loading...</span>
+    </div>
+
+    <!-- Resizable Chart Container -->
+    <div id="chart-wrapper">
+        <div id="chart"></div>
+    </div>
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
