@@ -10,7 +10,8 @@ from freqtrade.enums import RunMode
 config: Dict[str, Any] = {}
 
 config["timeframe"] = "5m"
-timerange = None
+
+timerange = "1730419200000-1735430100000"
 config["timerange"] = TimeRange.parse_timerange(timerange) if timerange else None
 
 config["exchange"] = {"name": "binance"}
@@ -36,6 +37,11 @@ config['api_server'] = {
 
 config["runmode"] = RunMode.WEBSERVER
 config["dry_run"] = True
+
+config["tradable_balance_ratio"] = config.get("tradable_balance_ratio", 0.99)
+
+config["fiat_display_currency"] = config.get("fiat_display_currency", "")
+
 config["stake_currency"] = config.get("stake_currency", "USDT")
 config["stake_amount"] = config.get("stake_amount", 30)
 config["dry_run_wallet"] = config.get("dry_run_wallet", 1000)

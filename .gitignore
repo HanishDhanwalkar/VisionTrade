@@ -1,6 +1,8 @@
 .vscode
 .env
 
+*.sqlite
+
 __pycache__/
 
 user_data/

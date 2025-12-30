@@ -3,8 +3,8 @@ from math import exp
 
 from pandas import DataFrame
 
-from freqtrade.freqtrade.constants import Config
-from freqtrade.freqtrade.optimize.hyperopt import IHyperOptLoss
+from freqtrade.constants import Config
+from freqtrade.optimize.hyperopt import IHyperOptLoss
 
 
 # Define some constants:
