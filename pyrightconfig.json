@@ -1,5 +1,6 @@
 {
     "extraPaths": [
-        "./freqtrade"
+        "./freqtrade",
+        "./freqtrade/ft_client"
     ]
 }
