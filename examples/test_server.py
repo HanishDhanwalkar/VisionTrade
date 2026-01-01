@@ -1,4 +1,5 @@
 import sys
+import time
 from pathlib import Path
 from typing import Dict, Any
 
@@ -96,17 +97,18 @@ if __name__ == "__main__":
     from freqtrade.rpc.api_server.webserver import ApiServer
     
     # This internally creates the ApiServer and attaches the RPC handler.
-    worker = Worker(args=None, config=config) # TODO: test {} instead of None
+    worker = Worker(
+        args={}, 
+        config=config
+    )
     
     try:
         print(f"API server is running on http://{config['api_server']['listen_ip_address']}:{config['api_server']['listen_port']}")
         print("Press Ctrl+C to stop")
         
         # Keep the process running while the background thread works
-        import time
         while True:
             time.sleep(1)
             
     except (KeyboardInterrupt, SystemExit):
-        print("Shutting down...")
         worker.exit()
