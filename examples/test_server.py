@@ -6,12 +6,20 @@ sys.path.append(str(Path(__file__).parent.parent / "freqtrade"))
 
 from freqtrade.configuration import TimeRange
 from freqtrade.enums import RunMode
+from freqtrade.loggers import setup_logging
+
+setup_logging(
+    config={
+        "verbosity": 0
+    }
+)
 
 config: Dict[str, Any] = {}
 
 config["timeframe"] = "5m"
 
-timerange = "1730419200000-1735430100000"
+# timerange = "1730419200000-1735430100000"
+timerange = None
 config["timerange"] = TimeRange.parse_timerange(timerange) if timerange else None
 
 config["exchange"] = {"name": "binance"}
@@ -74,12 +82,21 @@ config["strategy_path"] = str(Path(__file__).parent / "strategies")
 config["db_url"] = "sqlite:///tradesv3.sqlite"
 config["datadir"] = data_dir
 
+config["new_pairs_days"] = 1
+config["dataformat_ohlcv"] = "json"
+config["exportdirectory"] = config["user_data_dir"] / "backtest_results"
+if not config["exportdirectory"].exists():
+    config["exportdirectory"].mkdir(parents=True, exist_ok=True)
+
+config["export"] = config.get("export", "trades")
+
+
 if __name__ == "__main__":
     from freqtrade.worker import Worker
     from freqtrade.rpc.api_server.webserver import ApiServer
     
     # This internally creates the ApiServer and attaches the RPC handler.
-    worker = Worker(args=None, config=config)
+    worker = Worker(args=None, config=config) # TODO: test {} instead of None
     
     try:
         print(f"API server is running on http://{config['api_server']['listen_ip_address']}:{config['api_server']['listen_port']}")
