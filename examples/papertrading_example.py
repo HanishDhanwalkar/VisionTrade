@@ -20,7 +20,7 @@ config: Dict[str, Any] = {
     "max_open_trades": 3,
     "stake_currency": "USDT",
     "stake_amount": 30,
-    "fiat_display_currency": "USD",
+    "fiat_display_currency": "",
     "tradable_balance_ratio": 0.99,
     "dry_run": True,
     "dry_run_wallet": 1000,
@@ -41,7 +41,7 @@ config: Dict[str, Any] = {
         "listen_port": 8080,
         "verbosity": "error",
         "jwt_secret_key": "jwtSlimShady",
-        "CORS_origins": [],
+        "CORS_origins": ["*"],
         "username": "freqtrader",
         "password": "SlimShady"
     },
@@ -72,7 +72,7 @@ data_dir = folder.joinpath(exchange_name)
 config["data_dir"] = data_dir
 
 config["strategy"] = "SampleStrategy"
-config["strategy_path"] = str(Path(__file__).parent / "strategies")
+config["strategy_path"] = config["user_data_dir"] / "strategies"
 
 if "entry_pricing" not in config:
     config["entry_pricing"] = {
@@ -92,28 +92,47 @@ if "exit_pricing" not in config:
         "order_book_top": 1
     }
 
+def print_trade_summary():
+    """Fetches and prints a summary of all trades from the database."""
+    print("\n" + "="*40)
+    print("      FINAL TRADE SUMMARY")
+    print("="*40)
+    
+    trades = Trade.get_trades().all()
+    if not trades:
+        print("No trades were executed.")
+        return
+
+    total_profit = sum(t.realized_profit for t in trades)
+    wins = len([t for t in trades if t.realized_profit > 0])
+    losses = len([t for t in trades if t.realized_profit <= 0])
+    
+    print(f"Total Trades:  {len(trades)}")
+    print(f"Wins:          {wins}")
+    print(f"Losses:        {losses}")
+    print(f"Win Rate:      {(wins/len(trades))*100:.2f}%" if trades else "0%")
+    print(f"Total Profit:  {total_profit:.2f} {config['stake_currency']}")
+    print("-" * 40)
+    
+    for t in trades:
+        print(f"[{t.pair}] Profit: {t.realized_profit:.4f} {t.exit_reason}")
+    print("="*40 + "\n")
+
 def close_all_trades_and_exit(worker: Worker):
-    """
-    Closes all open trades and shuts down the bot safely.
-    """
     print("\n[!] Shutdown signal received. Closing all trades...")
     try:
-        # Access the internal bot instance
         bot = worker.freqtrade
-        
-        # Get all currently open trades from the DB
         open_trades = Trade.get_open_trades()
         
-        if not open_trades:
-            print("No open trades to close.")
-        else:
+        if open_trades:
             for trade in open_trades:
-                print(f"Force exiting trade for {trade.pair}...")
-                # Triggers a market sell for the trade
+                print(f"Force exiting open trade for {trade.pair}...")
                 bot.handle_exit_signal(trade, "emergency_exit")
         
+        # Print results before fully exiting
+        print_trade_summary()
+        
         worker.exit()
-        print("Cleanup complete. Bot stopped.")
     except Exception as e:
         print(f"Error during shutdown: {e}")
     finally:
@@ -121,7 +140,6 @@ def close_all_trades_and_exit(worker: Worker):
 
 if __name__ == "__main__":
     try:
-        # Initialize the Worker (This creates the FreqtradeBot and ApiServer)
         worker = Worker(args={}, config=config)
         
         # Connect Ctrl+C (SIGINT) to our cleanup function
@@ -129,9 +147,8 @@ if __name__ == "__main__":
 
         print(f"Bot started. UI: http://{config['api_server']['listen_ip_address']}:{config['api_server']['listen_port']}")
         
-        # The .run() method in worker.py handles the loop and state management internally
+        # Start the worker loop
         worker.run()
-            
+
     except Exception as e:
-        print(f"Critical error during startup: {e}")
-        sys.exit(1)
+        print(f"Fatal error: {e}")
